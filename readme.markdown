@@ -1,7 +1,7 @@
 #Readme
 
 
-##Overview
+##Overview of the original Plugin
 
 Follow me [@wesnolte](http://twitter.com/wesnolte)
 
@@ -19,6 +19,15 @@ Features include:
 ![jQuery OrgChart](http://i.imgur.com/T8kKA.png "jQuery OrgChart")
 
 ----
+##Differences
+
+* Now you can add nodes!
+* You can edit existing nodes labels.
+* Now you can delete nodes.
+
+It's not very clean, but I'm open to sugestions :-)
+
+----
 
 ##Expected Markup & Example Usage
 
@@ -32,7 +41,9 @@ You need to include the jQuery as well as the jOrgChart libraries. For example:
 
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery.jOrgChart.js"></script>
-	
+
+Download and add FancyBox2 http://fancyapps.com/fancybox/
+
 If you want to use the drag-and-drop functionality you'll need to include jQuery UI too:
 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
@@ -48,21 +59,21 @@ The core CSS is necessary to perform some of the basic styling i.e.
 You'll need to construct a nest unordered list that represents your node nesting. For example:
 
 	<ul id="org" style="display:none">
-	<li>
-	  Food
+	<li><span class="label_node">
+	  Food</span>
 	  <ul>
-	    <li>Beer</li>
-	    <li>Vegetables
+	    <li><span class="label_node">Beer</span></li>
+	    <li><span class="label_node">Vegetables</span>
 	      <ul>
-	        <li>Pumpkin</li>
-	        <li><a href="http://tquila.com" target="_blank">Aubergine</a></li>
+	        <li><span class="label_node">Pumpkin<span></li>
+	        <li><span class="label_node"><a href="http://tquila.com" target="_blank">Aubergine</a><span></li>
 	      </ul>
 	    </li>
-	    <li>Bread</li>
-	    <li>Chocolate
+	    <li><span class="label_node">Bread</span></li>
+	    <li><span class="label_node">Chocolate</span>
 	      <ul>
-	        <li>Topdeck</li>
-	        <li>Reese's Cups</li>
+	        <li><span class="label_node">Topdeck</span></li>
+	        <li><span class="label_node">Reese's Cups</span></li>
 	      </ul>
 	    </li>
 	  </ul>
@@ -72,16 +83,16 @@ You'll need to construct a nest unordered list that represents your node nesting
 If you want a sub-tree to start off hidden, just add `class="collapsed"` to a list item (`<li>`). That list item will appear, but everything below it won't. For example:
 
 	<ul id="org" style="display:none">
-      <li>Food:
+      <li><span class="label_node">Food:</span>
         <ul>
-          <li>Beer</li>
-          <li class=collapsed>Vegetables
+          <li><span class="label_node">Beer</span></li>
+          <li class=collapsed><span class="label_node">Vegetables</span>
             <ul>
-              <li>Carrot</li>
-              <li>Pea</li>
+              <li><span class="label_node">Carrot</span></li>
+              <li><span class="label_node">Pea</span></li>
             </ul>
           </li>
-          <li>Chocolate</li>
+          <li><span class="label_node">Chocolate</span></li>
         </ul>
       </li>
     </ul>
@@ -92,26 +103,35 @@ This plugin works by generating the tree as a series of nested tables. Each node
 -----
 
 ###The jQuery Call
+Add this function somewhere in your document:
+	
+	function init_tree(){
+            var opts = {
+                chartElement : '#chart', //your tree container
+                dragAndDrop  : true
+            };
+            $("#chart").html(""); //clean your container
+            $("#org").jOrgChart(opts); //creates the jOrgChart
+        }
 
-And the cherry on the top is the usual call, often but not always on document load. You'll need to specify the Id of the list in this call. For example:
+And the cherry on the top is the usual call on document load of the function you just make. For example:
 
 	jQuery(document).ready(function() {
-	    $("#org").jOrgChart();
+	    init_tree();
+	    
 	});
+	
+In order to preserve adding, editing and deleting nodes capabilities, please leave the jquery events listeners for *.edit*, *.del*, *.add*, *#edit_node*, *#add_node*.
+Of course, you can alter these methods to fit your requirements.
 	
 This call will append the markup for the OrgChart to the `<body>` element by default, but you can specify this as part of the options.
 
-----
-
-##Demo
-
-You can view a demo of this [here](http://bit.ly/u1XhTf "jQuery OrgChart").
 
 ------
 
 ##Sourcecode
 
-Source code with an example is available [here](https://github.com/wesnolte/jOrgChart/tree/master/example "Example & Source").
+Original Source code with an example is available [here](https://github.com/wesnolte/jOrgChart/tree/master/example "Example & Source").
 
 -----
 
