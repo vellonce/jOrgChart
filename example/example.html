@@ -5,22 +5,167 @@
     <link rel="stylesheet" href="css/jquery.jOrgChart.css"/>
     <link rel="stylesheet" href="css/custom.css"/>
     <link href="css/prettify.css" type="text/css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="fancybox/jquery.fancybox.css" type="text/css" />
     <script type="text/javascript" src="prettify.js"></script>
     
     <!-- jQuery includes -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-    
+
+    <script type="text/javascript" src="fancybox/jquery.fancybox.js"></script>
     <script src="jquery.jOrgChart.js"></script>
 
     <script>
-    jQuery(document).ready(function() {
-        $("#org").jOrgChart({
-            chartElement : '#chart',
-            dragAndDrop  : true
+
+        function init_tree(){
+            var opts = {
+                chartElement : '#chart',
+                dragAndDrop  : true
+            };
+            $("#chart").html("");
+            $("#org").jOrgChart(opts);
+        }
+        var click_flag = true;
+        var node_to_edit;
+
+        $(document).on("ready", function(){
+            init_tree();
+            var add_to_node, del_node, classList;
+            $(".edit").live("click", function(e){
+                classList = $(this).parent().parent().attr('class').split(/\s+/);
+                $.each(classList, function(index,item) {
+                    if(item != "temp" && item != "node" && item != "child" && item != "ui-draggable" && item != "ui-droppable"){
+                        add_to_node = item;
+                        console.log(".edit", add_to_node);
+                    }
+                });
+
+                $(".selector span").text("Elija una opción");
+
+                var tipo_n;
+                $.each(classList, function(index,item) {
+                    if(item != "temp" && item != "node" && item != "child" && item != "ui-draggable" && item != "ui-droppable"){
+                        del_node = item;
+                    }
+                    if(item == "root" || item == "child"){
+                        tipo_n = item;
+                    }
+                });
+                node_to_edit = $("li."+del_node+":not('.temp')");
+            }).fancybox({
+                        maxWidth	: 800,
+                        maxHeight	: 800,
+                        fitToView	: false,
+                        width		: '70%',
+                        height		: '70%',
+                        autoSize	: false,
+                        closeClick	: false,
+                        openEffect	: 'none',
+                        closeEffect	: 'none'
+                    });
+            $("#edit_node").click(function(e){
+                e.preventDefault();
+                //modify li and refresh tree
+                var edit_field = $("#edit_node_name");
+                var texto = edit_field.val();
+                node_to_edit.find("> .label_node:eq(0)").text(texto);
+                edit_field.val("");
+                $.fancybox.close();
+                init_tree();
+
+            });
+            //-- Listo editar :D
+            $(".del").live("click", function(e){
+                var nodo=$(this);
+
+                if(!nodo.parent().parent().hasClass("temp")){
+                    var nodeDiv = nodo.parent().parent();
+                    var cu = nodeDiv.find("a").attr("rel");
+                    classList = nodeDiv.attr('class').split(/\s+/);
+                    $.each(classList, function(index,item) {
+                        if(item != "temp" && item != "node" && item != "child" && item != "ui-draggable" && item != "ui-droppable"){
+                            del_node = item;
+                        }
+                    });
+                    var element = $("li."+del_node+":not('.temp')");
+                    element.remove();
+                    init_tree();
+                }
+
+            });
+            $(".add").live("click", function(){
+                click_flag=false;
+
+                classList = $(this).parent().parent().attr('class').split(/\s+/);
+                $.each(classList, function(index,item) {
+                    if(item != "temp" && item != "node" && item != "child" && item != "ui-draggable" && item != "ui-droppable"){
+                        add_to_node = item;
+                    }
+                });
+
+            }).fancybox({
+                        maxWidth	: 800,
+                        maxHeight	: 800,
+                        fitToView	: false,
+                        width		: '70%',
+                        height		: '70%',
+                        autoSize	: false,
+                        closeClick	: false,
+                        openEffect	: 'none',
+                        closeEffect	: 'none',
+                        afterClose  : function(){click_flag=true;init_tree()}
+                    });
+
+            $("#add_node").click(function(e){
+                e.preventDefault();
+
+                    //unidad de consumo agregada, agregar li a la lista, y refrescar arbol
+
+                    var tipo_nodo = "";
+                    var text_field = $("#new_node_name");
+                    var texto = text_field.val();
+                    text_field.val("");
+
+                    var $node = $("li."+add_to_node+":not('.temp')");
+                    var childs = $node.find("ul:eq(0) > li:not('.temp')").size();
+                    childs++;
+                    tipo_nodo += "child "+add_to_node+"_"+childs;
+                    var append_text = "<li class='"+ tipo_nodo +"'>";
+                    append_text += "<span class='label_node'>" + texto + "</span>";
+                    append_text += "</li>";
+                    if($node.find("ul").size()==0){
+                        append_text = "<ul>" + append_text + "</ul>";
+                        $node.append(append_text);
+                    }else{
+                        $node.find("ul:eq(0)").append(append_text);
+                    }
+
+
+                    $.fancybox.close();
+                    init_tree();
+
+            });
+
+
+            //forms behavior
+            $("#new_node_name, #edit_node_name").on("keyup", function(evt){
+                var id = $(this).attr("id");
+                if($(this).val() != ''){
+                    if(id == "new_node_name"){
+                        $("#add_node").show();
+                    }else{
+                        $("#edit_node").show();
+                    }
+                }else{
+                    if(id == "new_node_name"){
+                        $("#add_node").hide();
+                    }else{
+                        $("#edit_node").hide();
+                    }
+                }
+            });
+
         });
-    });
     </script>
   </head>
 
@@ -32,7 +177,7 @@
                 <ul class="nav">
                     <li><a href="http://github.com/wesnolte">Github</a></li>
                     <li><a href="http://twitter.com/wesnolte">Twitter</a></li>                  
-                    <li><a href="http://th3silverlining.com">Blog</a></li>      
+                    <li><a href="http://th3silverlining.com">Blog</a></li>
                 </ul>
                 <div class="pull-right">
                     <div class="alert-message info" id="show-list">Show underlying list.</div>
@@ -44,49 +189,49 @@
     </div>
     
     <ul id="org" style="display:none">
-    <li>
-       Food
-       <ul>
-         <li id="beer">Beer</li>
-         <li>Vegetables
-           <a href="http://wesnolte.com" target="_blank">Click me</a>
-           <ul>
-             <li>Pumpkin</li>
-             <li>
-                <a href="http://tquila.com" target="_blank">Aubergine</a>
-                <p>A link and paragraph is all we need.</p>
-             </li>
-           </ul>
-         </li>
-         <li class="fruit">Fruit
-           <ul>
-             <li>Apple
-               <ul>
-                 <li>Granny Smith</li>
-               </ul>
-             </li>
-             <li>Berries
-               <ul>
-                 <li>Blueberry</li>
-                 <li><img src="images/raspberry.jpg" alt="Raspberry"/></li>
-                 <li>Cucumber</li>
-               </ul>
-             </li>
-           </ul>
-         </li>
-         <li>Bread</li>
-         <li class="collapsed">Chocolate
-           <ul>
-             <li>Topdeck</li>
-             <li>Reese's Cups</li>
-           </ul>
-         </li>
-       </ul>
-     </li>
+        <li class='root'>
+           <span class="label_node">Parent</span>
+            <ul>
+                <li class='child 1'>
+                    <span class="label_node">Child 1</span>
+                </li>
+                <li class='child 2'>
+                    <span class="label_node">Child 2</span>
+                </li>
+            </ul>
+        </li>
    </ul>            
     
     <div id="chart" class="orgChart"></div>
-    
+    <div id="fancy" class="hidden">
+        <form action="." method="post" id="add_node_form">
+            <h1 class="title_lb">New Node</h1>
+            <div class="span12" id="add_nodo">
+                <p class="notice span3">
+                    Enter node caption
+                </p>
+                <input type="text" name="new_node_name" id="new_node_name" class="span6"/>
+                <div class="span12">
+                    <button id="add_node" class="aqua_btn span3 hidden">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="fancy_edit" class="hidden">
+        <form action="." method="post" id="edit_node_form">
+            <h1 class="title_lb">Edit Node</h1>
+            <div class="span12" id="edit_nodo">
+                <p class="notice span3">
+                    Enter node caption
+                </p>
+                <input type="text" name="node_name" id="edit_node_name" class="span6"/>
+                <div class="span12">
+                    <button id="edit_node" class="aqua_btn span3 hidden">Edit</button>
+                </div>
+            </div>
+        </form>
+    </div>
     <script>
         jQuery(document).ready(function() {
             

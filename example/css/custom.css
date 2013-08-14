@@ -42,6 +42,7 @@ a:hover{
 	clear: both;
 }
 
+
 /* Header */
 .brand{
 	color 				: #E05E00 !important;	
@@ -90,3 +91,29 @@ a:hover{
 		line-height 	: 11px;
 		padding 		: 2px;
 	}
+.hidden {
+    display: none;
+}
+.temp{
+    border: dotted 2px #869baf !important;
+}
+.add {
+    background: url(../images/plus_circle.png) no-repeat 50% 50%;
+}
+.del {
+    background: url(../images/del_circle.png) no-repeat 50% 50%;
+}
+.edit {
+    background: url(../images/edit_squere.png) no-repeat 50% 50%;
+}
+.edit, .del, .add{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+}
+
+.del, .delete{
+    margin-right: 10px;
+    margin-left: 0;
+}
